@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_dashboard"
+        android:icon="@drawable/ic_code_black_24dp"
+        android:title="Code structure" />
+
+    <item
+        android:id="@+id/structure_chart"
+        android:icon="@drawable/ic_widgets_black_24dp"
+        android:title="Project structure chart" />
+    <item
+        android:id="@+id/close_project"
+        android:icon="@drawable/ic_close_black_24dp"
+        android:title="Close the project" />
+
+</menu>

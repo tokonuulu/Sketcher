@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/class_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    card_view:cardCornerRadius="0dp"
+    card_view:cardElevation="2dp">
+
+    <LinearLayout
+        android:id="@+id/relativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingRight="8dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="0.8"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/class_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Adder"
+                android:textAppearance="@style/TextAppearance.Compat.Notification.Title" />
+
+            <TextView
+                android:id="@+id/class_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="This class is used for adding multiple types of data"
+                android:textAppearance="@style/TextAppearance.Compat.Notification.Info" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/function_icon"
+            android:padding="8dp"
+            android:layout_weight="0.2"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:scaleType="fitEnd"
+            android:src="@drawable/box" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
