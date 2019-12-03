@@ -27,6 +27,7 @@
             <TextView
                 android:id="@+id/class_name"
                 android:layout_width="wrap_content"
+                android:textColor="#355c7d"
                 android:layout_height="wrap_content"
                 android:text="Adder"
                 android:textAppearance="@style/TextAppearance.Compat.Notification.Title" />

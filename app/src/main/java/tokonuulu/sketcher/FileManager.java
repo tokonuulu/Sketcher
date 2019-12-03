@@ -26,11 +26,15 @@ import tokonuulu.sketcher.blockClass.Function;
 import tokonuulu.sketcher.blockClass.GlobalVariable;
 import tokonuulu.sketcher.blockClass.Header;
 import tokonuulu.sketcher.blockClass.blockClass;
+import tokonuulu.sketcher.commentFeed.AudioComment;
+import tokonuulu.sketcher.commentFeed.Comment;
+import tokonuulu.sketcher.commentFeed.TextComment;
 
 public class FileManager {
     private final String sourceExt = ".str";
     private final String nodeSourceListExt = ".sources";
     private final String structureExt = ".str";
+    private final String commentExt = ".comments";
 
     public Boolean saveSourceData (Context context, String currentProject, String currentSource, List<blockClass> data) {
         File folder = new File( context.getFilesDir()+
@@ -294,6 +298,80 @@ public class FileManager {
         }
         catch (IOException e) {
             Log.e("LOAD_STR", "File read failed: " + e.toString());
+        }
+        return null;
+    }
+
+    public Boolean saveCommentData (Context context, String currentProject, List<Comment> data) {
+        File folder = new File( context.getFilesDir()+
+                File.separator + currentProject);
+        if ( !folder.exists() )
+            folder.mkdirs();
+
+        try {
+            File destination = new File(folder, commentExt);
+            if ( !destination.exists() )
+                destination.createNewFile();
+
+            final RuntimeTypeAdapterFactory<Comment> typeFactory = RuntimeTypeAdapterFactory
+                    .of(Comment.class, "typename") // Here you specify which is the parent class and what field particularizes the child class.
+                    .registerSubtype(TextComment.class) // if the flag equals the class name, you can skip the second parameter. This is only necessary, when the "type" field does not equal the class name.
+                    .registerSubtype(AudioComment.class);
+
+            final Gson gson = new GsonBuilder().registerTypeAdapterFactory(typeFactory).create();
+
+            Type type = new TypeToken<ArrayList<Comment>>() {}.getType();
+            String resultString = gson.toJson(data, type);
+
+            Log.v("SAVE_COMMENT_FILE", resultString);
+
+            FileWriter fileWriter = new FileWriter(destination);
+            fileWriter.write(resultString);
+            fileWriter.close();
+            return true;
+        }
+        catch (IOException e) {
+            Log.e("SAVE_COMMENT_FILE", "File write failed: " + e.toString());
+            return false;
+        }
+    }
+
+    public List<Comment> loadCommentData (Context context, String currentProject) {
+        File folder = new File( context.getFilesDir()+
+                File.separator + currentProject);
+
+        if ( !folder.exists() )
+            return null;
+
+        try {
+            File destination = new File(folder, commentExt);
+            if ( !destination.exists() )
+                return null;
+
+            StringBuilder stringBuilder = new StringBuilder();
+            String line;
+            BufferedReader in = null;
+
+            in = new BufferedReader(new FileReader(destination));
+            while ((line = in.readLine()) != null) stringBuilder.append(line);
+
+            String resultString = stringBuilder.toString();
+
+            final RuntimeTypeAdapterFactory<Comment> typeFactory = RuntimeTypeAdapterFactory
+                    .of(Comment.class, "typename") // Here you specify which is the parent class and what field particularizes the child class.
+                    .registerSubtype(TextComment.class) // if the flag equals the class name, you can skip the second parameter. This is only necessary, when the "type" field does not equal the class name.
+                    .registerSubtype(AudioComment.class);
+
+            final Gson gson = new GsonBuilder().registerTypeAdapterFactory(typeFactory).create();
+
+            Type type = new TypeToken<ArrayList<Comment>>() {}.getType();
+            List<Comment> commentList = gson.fromJson(resultString, type);
+
+            Log.v("LOAD_COMMENT_FILE", resultString);
+            return commentList;
+        }
+        catch (IOException e) {
+            Log.e("LOAD_COMMENT_FILE", "File read failed: " + e.toString());
         }
         return null;
     }

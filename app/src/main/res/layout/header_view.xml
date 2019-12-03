@@ -30,6 +30,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
+                android:textColor="#df5900"
                 android:text="@string/header_text"
                 android:textAppearance="@style/TextAppearance.Compat.Notification.Title" />
 

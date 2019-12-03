@@ -28,6 +28,7 @@
                 android:id="@+id/function_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="#8e2c85"
                 android:text="void sort_alpha_order ()"
                 android:textAppearance="@style/TextAppearance.Compat.Notification.Title" />
 

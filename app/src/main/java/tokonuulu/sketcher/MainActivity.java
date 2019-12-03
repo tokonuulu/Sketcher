@@ -1,9 +1,11 @@
 package tokonuulu.sketcher;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,6 +24,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -38,15 +42,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import tokonuulu.sketcher.blockClass.Class;
 import tokonuulu.sketcher.blockClass.Function;
 import tokonuulu.sketcher.blockClass.GlobalVariable;
 import tokonuulu.sketcher.blockClass.Header;
 import tokonuulu.sketcher.blockClass.blockClass;
+import tokonuulu.sketcher.blocklist.AddClass;
 import tokonuulu.sketcher.blocklist.AddFunction;
 import tokonuulu.sketcher.blocklist.AddGVariable;
 import tokonuulu.sketcher.blocklist.AddHeader;
 import tokonuulu.sketcher.blocklist.ItemMoveCallback;
 import tokonuulu.sketcher.blocklist.RecyclerViewAdapter;
+import tokonuulu.sketcher.commentFeed.CommentFeed;
 import tokonuulu.sketcher.start.StartActivity;
 import tokonuulu.sketcher.structureChart.StructureChart;
 
@@ -74,6 +81,21 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.RECORD_AUDIO},
+                    1);
+        }
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    1);
+        }
+
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_main);
 
@@ -99,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        menuItem.setChecked(true);
+                        //menuItem.setChecked(true);
                         selectFragment(menuItem);
                         return true;
                     }
@@ -137,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
         if (blockList == null)
             blockList = new ArrayList<>();
 
-        mAdapter = new RecyclerViewAdapter(blockList);
+        mAdapter = new RecyclerViewAdapter(MainActivity.this, currentProject, currentSource, blockList);
         mAdapter.setContext(MainActivity.this);
 
         ItemTouchHelper.Callback callback =
@@ -167,6 +189,10 @@ public class MainActivity extends AppCompatActivity {
                         action = ADD_GVARIABLE;
                         speedDialView.close();
                         break;
+                    case R.id.add_class:
+                        action = ADD_CLASS;
+                        speedDialView.close();
+                        break;
                     default:
                         action = -1;
                         speedDialView.close();
@@ -182,6 +208,9 @@ public class MainActivity extends AppCompatActivity {
                             break;
                         case ADD_HEADER:
                             addHeader();
+                            break;
+                        case ADD_CLASS:
+                            addClass();
                             break;
                     }
                 } else {
@@ -204,6 +233,11 @@ public class MainActivity extends AppCompatActivity {
         intent.putStringArrayListExtra("functions", functions);
         startActivityForResult(intent, ADD_FUNCTION);
     }
+    private void addClass() {
+        Intent intent = new Intent(this, AddClass.class);
+        startActivityForResult(intent, ADD_CLASS);
+    }
+
     private void addGVariable() {
         Intent intent = new Intent(this, AddGVariable.class);
         startActivityForResult(intent, ADD_GVARIABLE);
@@ -267,7 +301,7 @@ public class MainActivity extends AppCompatActivity {
         if (blockList == null)
             blockList = new ArrayList<>();
 
-        mAdapter = new RecyclerViewAdapter(blockList);
+        mAdapter = new RecyclerViewAdapter(MainActivity.this, currentProject, currentSource, blockList);
         mAdapter.setContext(MainActivity.this);
 
         ItemTouchHelper.Callback callback =
@@ -330,11 +364,18 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, StartActivity.class);
                 startActivityForResult(intent, PROJECT_CHANGE);
                 break;
+            case R.id.comment_feed:
+                Intent commentIntent = new Intent(this, CommentFeed.class);
+                commentIntent.putExtra("project", currentProject);
+                commentIntent.putExtra("source", "");
+                commentIntent.putExtra("block", "");
+                startActivity(commentIntent);
+                break;
             default:
                 break;
         }
 
-        menuItem.setChecked(true);
+        //menuItem.setChecked(true);
 
         mDrawerLayout.closeDrawers();
     }
@@ -413,6 +454,15 @@ public class MainActivity extends AppCompatActivity {
                     String desc = data.getStringExtra("desc");
 
                     blockList.add(0, new Header(name, desc));
+                    mAdapter.notifyDataSetChanged();
+                }
+                break;
+            case ADD_CLASS:
+                if (resultCode == RESULT_OK) {
+                    String name = data.getStringExtra("name");
+                    String desc = data.getStringExtra("desc");
+
+                    blockList.add(new Class(name, desc));
                     mAdapter.notifyDataSetChanged();
                 }
                 break;

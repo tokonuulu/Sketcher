@@ -3,17 +3,22 @@
 
     <item
         android:id="@+id/add_function"
-        android:icon="@drawable/ic_remove_white_24dp"
+        android:icon="@drawable/function"
         android:title="Add a function" />
 
     <item
         android:id="@+id/add_header"
-        android:icon="@drawable/ic_add_white_24dp"
+        android:icon="@drawable/link"
         android:title="Add a header" />
 
     <item
         android:id="@+id/add_gvariable"
-        android:icon="@drawable/ic_add_white_24dp"
+        android:icon="@drawable/variable"
         android:title="Add a GV" />
+
+    <item
+        android:id="@+id/add_class"
+        android:icon="@drawable/box"
+        android:title="Add a class" />
 
 </menu>

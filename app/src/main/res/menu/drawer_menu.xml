@@ -10,6 +10,12 @@
         android:id="@+id/structure_chart"
         android:icon="@drawable/ic_widgets_black_24dp"
         android:title="Project structure chart" />
+
+    <item
+        android:id="@+id/comment_feed"
+        android:icon="@drawable/ic_comment_black_24dp"
+        android:title="Comments" />
+
     <item
         android:id="@+id/close_project"
         android:icon="@drawable/ic_close_black_24dp"

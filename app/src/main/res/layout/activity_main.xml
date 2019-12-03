@@ -22,6 +22,7 @@
 
     <com.leinardi.android.speeddial.SpeedDialView
         android:id="@+id/speedDial"
+        android:layout_marginBottom="30dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="bottom"
