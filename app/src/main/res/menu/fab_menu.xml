@@ -2,11 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/open_sources"
-        android:icon="@drawable/ic_code_white_24dp"
-        android:title="Open sources" />
-
-    <item
         android:id="@+id/remove_node"
         android:icon="@drawable/ic_remove_white_24dp"
         android:title="Remove block" />

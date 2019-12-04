@@ -1,16 +1,10 @@
 package tokonuulu.sketcher.structureChart;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,58 +15,49 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+
 import com.google.android.material.snackbar.Snackbar;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.leinardi.android.speeddial.SpeedDialActionItem;
 import com.leinardi.android.speeddial.SpeedDialView;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
-
 import de.blox.graphview.BaseGraphAdapter;
-import de.blox.graphview.Edge;
 import de.blox.graphview.Graph;
 import de.blox.graphview.GraphView;
 import de.blox.graphview.Node;
 import de.blox.graphview.ViewHolder;
-import de.blox.graphview.energy.FruchtermanReingoldAlgorithm;
-import de.blox.graphview.layered.SugiyamaAlgorithm;
 import de.blox.graphview.tree.BuchheimWalkerAlgorithm;
 import de.blox.graphview.tree.BuchheimWalkerConfiguration;
 import tokonuulu.sketcher.FileManager;
-import tokonuulu.sketcher.MainActivity;
 import tokonuulu.sketcher.R;
 import tokonuulu.sketcher.source.EditSources;
 
-public class StructureChart extends AppCompatActivity {
+public class StructureChardFragment extends Fragment {
     private int nodeCount = 1;
     private Graph graph;
     private Node currentNode;
-    private String currentProject;
     private FileManager fileManager;
     BaseGraphAdapter<ViewHolder> adapter;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_structure_chart);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
+
+        View rootview = inflater.inflate(R.layout.activity_structure_chart, container, false);
 
         /* Initiating speed dial */
-        final SpeedDialView speedDialView = findViewById(R.id.speedDial);
+        final SpeedDialView speedDialView = rootview.findViewById(R.id.speedDial);
         speedDialView.inflate(R.menu.fab_menu);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-
-        currentProject = getIntent().getStringExtra("project");
-        Log.e("StructureChart", "project retrived from intent " + currentProject);
-
         /*
-        * TODO: need to implement data sync
-        * */
+         * TODO: need to implement data sync
+         * */
 
         speedDialView.setOnActionSelectedListener(new SpeedDialView.OnActionSelectedListener() {
             @Override
@@ -93,12 +78,11 @@ public class StructureChart extends AppCompatActivity {
                 }
                 if (action == 1) addNode();
                 else if (action == 2) removeNode();
-                else if (action == 3) openSources();
                 return true;
             }
         });
 
-        final GraphView graphView = findViewById(R.id.graph);
+        final GraphView graphView = rootview.findViewById(R.id.graph);
 
         // example tree
         /*final Node node1 = new Node("Main");
@@ -112,7 +96,9 @@ public class StructureChart extends AppCompatActivity {
         graph.addEdge(node1, node4);*/
 
         fileManager = new FileManager();
-        graph = fileManager.loadStructureData(this, currentProject);
+        final Tabbed tabbed = (Tabbed) getActivity();
+
+        graph = fileManager.loadStructureData(getActivity(), tabbed.currentProject);
         if (graph == null)
             graph = new Graph();
 
@@ -139,6 +125,7 @@ public class StructureChart extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 currentNode = adapter.getNode(position);
+                tabbed.currentNode = currentNode.getData().toString();
                 Snackbar.make(graphView,  currentNode.getData().toString() + " has been selected", Snackbar.LENGTH_SHORT).show();
             }
         });
@@ -156,18 +143,8 @@ public class StructureChart extends AppCompatActivity {
                 .setOrientation(BuchheimWalkerConfiguration.ORIENTATION_TOP_BOTTOM)
                 .build();
         adapter.setAlgorithm(new BuchheimWalkerAlgorithm(configuration));
-    }
 
-    private void openSources() {
-        if (currentNode == null && graph.getNodeCount() != 0) {
-            Toast.makeText(StructureChart.this, "Parent has not been selected!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        Intent intent = new Intent(this, EditSources.class);
-        intent.putExtra("project", currentProject);
-        intent.putExtra("node", currentNode.getData().toString());
-        startActivity(intent);
+        return rootview;
     }
 
     class SimpleViewHolder extends ViewHolder {
@@ -186,15 +163,15 @@ public class StructureChart extends AppCompatActivity {
     void addNode() {
 
         if (currentNode == null && graph.getNodeCount() != 0) {
-            Toast.makeText(StructureChart.this, "Parent has not been selected!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Parent has not been selected!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(StructureChart.this);
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
         alertDialog.setTitle("New block");
         alertDialog.setMessage("Enter block's name");
 
-        final EditText input = new EditText(StructureChart.this);
+        final EditText input = new EditText(getActivity());
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT);
@@ -226,27 +203,29 @@ public class StructureChart extends AppCompatActivity {
                 });
 
         alertDialog.show();
-}
+    }
     void removeNode() {
         if (currentNode != null) {
             graph.removeNode(currentNode);
             currentNode = null;
         } else {
-            Toast.makeText(StructureChart.this, "Block has not been selected!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Block has not been selected!", Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
-    protected void onStop() {
-        fileManager.saveStructureData(this, currentProject, graph);
-        super.onStop();
+    public void onPause() {
+        Tabbed tabbed = (Tabbed) getActivity();
+        fileManager.saveStructureData(getActivity(), tabbed.currentProject, graph);
+        super.onPause();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                FragmentManager fragmentManager = getFragmentManager();
+                fragmentManager.popBackStackImmediate();
                 return true;
         }
         return super.onOptionsItemSelected(item);

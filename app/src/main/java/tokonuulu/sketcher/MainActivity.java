@@ -56,6 +56,7 @@ import tokonuulu.sketcher.blocklist.RecyclerViewAdapter;
 import tokonuulu.sketcher.commentFeed.CommentFeed;
 import tokonuulu.sketcher.start.StartActivity;
 import tokonuulu.sketcher.structureChart.StructureChart;
+import tokonuulu.sketcher.structureChart.Tabbed;
 
 public class MainActivity extends AppCompatActivity {
     final int ADD_FUNCTION = 1;
@@ -354,7 +355,7 @@ public class MainActivity extends AppCompatActivity {
     public void selectFragment(MenuItem menuItem) {
         switch(menuItem.getItemId()) {
             case R.id.structure_chart:
-                Intent strintent = new Intent(this, StructureChart.class);
+                Intent strintent = new Intent(this, Tabbed.class);
                 strintent.putExtra("project", currentProject);
                 startActivity(strintent);
                 break;
