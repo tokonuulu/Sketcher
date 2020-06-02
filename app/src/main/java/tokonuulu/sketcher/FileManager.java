@@ -28,6 +28,7 @@ import tokonuulu.sketcher.blockClass.Header;
 import tokonuulu.sketcher.blockClass.blockClass;
 import tokonuulu.sketcher.commentFeed.AudioComment;
 import tokonuulu.sketcher.commentFeed.Comment;
+import tokonuulu.sketcher.commentFeed.PictureComment;
 import tokonuulu.sketcher.commentFeed.TextComment;
 
 public class FileManager {
@@ -316,7 +317,8 @@ public class FileManager {
             final RuntimeTypeAdapterFactory<Comment> typeFactory = RuntimeTypeAdapterFactory
                     .of(Comment.class, "typename") // Here you specify which is the parent class and what field particularizes the child class.
                     .registerSubtype(TextComment.class) // if the flag equals the class name, you can skip the second parameter. This is only necessary, when the "type" field does not equal the class name.
-                    .registerSubtype(AudioComment.class);
+                    .registerSubtype(AudioComment.class)
+                    .registerSubtype(PictureComment.class);
 
             final Gson gson = new GsonBuilder().registerTypeAdapterFactory(typeFactory).create();
 
@@ -360,7 +362,8 @@ public class FileManager {
             final RuntimeTypeAdapterFactory<Comment> typeFactory = RuntimeTypeAdapterFactory
                     .of(Comment.class, "typename") // Here you specify which is the parent class and what field particularizes the child class.
                     .registerSubtype(TextComment.class) // if the flag equals the class name, you can skip the second parameter. This is only necessary, when the "type" field does not equal the class name.
-                    .registerSubtype(AudioComment.class);
+                    .registerSubtype(AudioComment.class)
+                    .registerSubtype(PictureComment.class);
 
             final Gson gson = new GsonBuilder().registerTypeAdapterFactory(typeFactory).create();
 

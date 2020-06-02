@@ -3,6 +3,8 @@ package tokonuulu.sketcher.commentFeed;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.UriMatcher;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.util.Log;
@@ -17,15 +19,18 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import android.os.Handler;
 
+import com.bumptech.glide.Glide;
+
 import tokonuulu.sketcher.R;
 
 public class commentListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private final static int TYPE_TEXT = 1, TYPE_AUDIO = 2, TYPE_VIDEO = 3;
+    private final static int TYPE_TEXT = 1, TYPE_AUDIO = 2, TYPE_VIDEO = 3, TYPE_PICTURE = 4;
     private List<Comment> data;
     private List<Comment> wholeList;
     private Context context;
@@ -46,9 +51,9 @@ public class commentListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             return TYPE_TEXT;
         } else if (data.get(position) instanceof AudioComment) {
             return TYPE_AUDIO;
-        } /*else if (data.get(position) instanceof Header) {
-            return TYPE_HEADER;
-        }*/
+        } else if (data.get(position) instanceof PictureComment) {
+            return TYPE_PICTURE;
+        }
         return -1;
     }
 
@@ -74,6 +79,13 @@ public class commentListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                         .inflate(layout, parent, false);
                 viewHolder = new commentListAdapter.AudioViewHolder(Audio);
                 break;
+            case TYPE_PICTURE:
+                layout = R.layout.comment_picture_view;
+                View Picture = LayoutInflater
+                        .from(parent.getContext())
+                        .inflate(layout, parent, false);
+                viewHolder = new commentListAdapter.PictureViewHolder(Picture);
+                break;
             default:
                 viewHolder = null;
                 break;
@@ -91,6 +103,10 @@ public class commentListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             case TYPE_AUDIO:
                 AudioComment audioComment = (AudioComment) data.get(position);
                 ((commentListAdapter.AudioViewHolder) holder).updateView(audioComment);
+                break;
+            case TYPE_PICTURE:
+                PictureComment pictureComment = (PictureComment) data.get(position);
+                ((commentListAdapter.PictureViewHolder) holder).updateView(pictureComment);
                 break;
         }
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -256,8 +272,44 @@ public class commentListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                         changeSeekbar();
                     }
                 };
-                handler.postDelayed(runnable, 500);
+                handler.postDelayed(runnable, 1000);
             }
+        }
+    }
+
+
+    public class PictureViewHolder extends RecyclerView.ViewHolder {
+
+        private TextView source, date;
+        private ImageView picture;
+
+        public PictureViewHolder(View itemView) {
+            super(itemView);
+            // Initiate view
+            source=(TextView)itemView.findViewById(R.id.source);
+            date=(TextView)itemView.findViewById(R.id.date);
+            picture=(ImageView) itemView.findViewById(R.id.picture);
+        }
+
+        public void updateView (PictureComment pictureComment){
+            // Attach values for each item
+            String Source = pictureComment.getSource();
+            if ( !pictureComment.block.isEmpty() )
+                Source = Source + " : " + pictureComment.block;
+
+            String Date   = pictureComment.getDate();
+            String picturePath   = pictureComment.getPicturePath();
+
+            source.setText(Source);
+            if ( Source.equals("") )
+                source.setText("Project");
+            date.setText(Date);
+
+            Bitmap myBitmap = BitmapFactory.decodeFile(picturePath);
+            File f = new File(picturePath);
+            //picture.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+
+            Glide.with(context).load(picturePath).into(picture);
         }
     }
 

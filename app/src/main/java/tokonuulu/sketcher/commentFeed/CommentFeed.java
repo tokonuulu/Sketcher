@@ -1,5 +1,6 @@
 package tokonuulu.sketcher.commentFeed;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,7 +13,10 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -52,7 +56,7 @@ public class CommentFeed extends AppCompatActivity {
     private commentListAdapter adapter;
     private List<Comment> commentList;
     private List<Comment> targetList;
-    final int ADD_TEXT = 1, ADD_AUDIO = 2;
+    final int ADD_TEXT = 1, ADD_AUDIO = 2, ADD_PICTURE = 3;
     private FileManager fileManager;
     private String currentProject;
     private String Source;
@@ -165,6 +169,10 @@ public class CommentFeed extends AppCompatActivity {
                         action = ADD_AUDIO;
                         speedDialView.close();
                         break;
+                    case R.id.add_picture:
+                        action = ADD_PICTURE;
+                        speedDialView.close();
+                        break;
                     default:
                         action = -1;
                         speedDialView.close();
@@ -173,6 +181,7 @@ public class CommentFeed extends AppCompatActivity {
 
                 if (action == ADD_TEXT) addTextComment();
                 else if (action == ADD_AUDIO) addAudioComment();
+                else if (action == ADD_PICTURE) addPictureComment();
 
                 return true;
             }
@@ -252,6 +261,18 @@ public class CommentFeed extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
     }
 
+    void addPictureComment () {
+        //Create an Intent with action as ACTION_PICK
+        Intent intent=new Intent(Intent.ACTION_PICK);
+        // Sets the type as image/*. This ensures only components of type image are selected
+        intent.setType("image/*");
+        //We pass an extra array with the accepted mime types. This will ensure only components with these MIME types as targeted.
+        String[] mimeTypes = {"image/jpeg", "image/png"};
+        intent.putExtra(Intent.EXTRA_MIME_TYPES,mimeTypes);
+        // Launching the Intent
+        startActivityForResult(intent, ADD_PICTURE);
+    }
+
     void addTextComment () {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(CommentFeed.this);
         alertDialog.setTitle("New comment");
@@ -324,5 +345,34 @@ public class CommentFeed extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == ADD_PICTURE) {
+            if (resultCode == RESULT_OK) {
+                Uri selectedImage = data.getData();
+                String[] filePathColumn = { MediaStore.Images.Media.DATA };
+                // Get the cursor
+                Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+                // Move to first row
+                cursor.moveToFirst();
+                //Get the column index of MediaStore.Images.Media.DATA
+                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                //Gets the String value in the column
+                String imgDecodableString = cursor.getString(columnIndex);
+                cursor.close();
+
+                Calendar calendar = Calendar.getInstance();
+                String date = DateFormat.getDateInstance(DateFormat.FULL).format(calendar.getTime());
+
+                Log.e("IMAGE FILE", imgDecodableString);
+
+                commentList.add(0, new PictureComment(Source, Block, date, imgDecodableString));
+                targetList.add(0, new PictureComment(Source, Block, date, imgDecodableString));
+                adapter.notifyDataSetChanged();
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

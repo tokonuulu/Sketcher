@@ -9,6 +9,11 @@
     <item
         android:id="@+id/add_audio"
         android:icon="@drawable/ic_record_voice_over_white_24dp"
-        android:title="Add audio comment" />
+        android:title="Add audio" />
+
+    <item
+        android:id="@+id/add_picture"
+        android:icon="@drawable/ic_insert_photo_white_24dp"
+        android:title="Add picture" />
 
 </menu>

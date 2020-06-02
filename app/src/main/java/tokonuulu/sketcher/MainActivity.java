@@ -54,6 +54,7 @@ import tokonuulu.sketcher.blocklist.AddHeader;
 import tokonuulu.sketcher.blocklist.ItemMoveCallback;
 import tokonuulu.sketcher.blocklist.RecyclerViewAdapter;
 import tokonuulu.sketcher.commentFeed.CommentFeed;
+import tokonuulu.sketcher.sourceView.SourceView;
 import tokonuulu.sketcher.start.StartActivity;
 import tokonuulu.sketcher.structureChart.StructureChart;
 import tokonuulu.sketcher.structureChart.Tabbed;
@@ -371,6 +372,12 @@ public class MainActivity extends AppCompatActivity {
                 commentIntent.putExtra("source", "");
                 commentIntent.putExtra("block", "");
                 startActivity(commentIntent);
+                break;
+            case R.id.source_code:
+                Intent sourceIntent = new Intent(this, SourceView.class);
+                sourceIntent.putExtra("project", currentProject);
+                sourceIntent.putExtra("source", currentSource);
+                startActivity(sourceIntent);
                 break;
             default:
                 break;

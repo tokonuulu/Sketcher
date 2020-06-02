@@ -2,9 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/navigation_dashboard"
+        android:id="@+id/source_code"
         android:icon="@drawable/ic_code_black_24dp"
-        android:title="Code structure" />
+        android:title="Source code" />
 
     <item
         android:id="@+id/structure_chart"
